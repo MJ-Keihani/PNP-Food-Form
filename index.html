@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>فرم انتخاب روزهای غذا</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+
+    <!-- Form -->
+    <section id="formSection">
+      <h1>فرم غذا</h1>
+
+      <form id="mealForm" onsubmit="return false;">
+        <label class="field">
+          <span> :نام و نام خانوادگی</span>
+          <input type="text" id="fullName" placeholder="Name Please " required />
+        </label>
+
+        <fieldset class="days-fieldset">
+          <legend>انتخاب روزهای هفته</legend>
+
+          <div class="day-row"><label><input type="checkbox" name="day" value="شنبه" /> شنبه</label></div>
+          <div class="day-row"><label><input type="checkbox" name="day" value="یک‌شنبه" /> یک‌شنبه</label></div>
+          <div class="day-row"><label><input type="checkbox" name="day" value="دوشنبه" /> دوشنبه</label></div>
+          <div class="day-row"><label><input type="checkbox" name="day" value="سه‌شنبه" /> سه‌شنبه</label></div>
+          <div class="day-row"><label><input type="checkbox" name="day" value="چهارشنبه" /> چهارشنبه</label></div>
+        </fieldset>
+
+        <div class="actions">
+          <button id="sendBtn" type="button">ارسال به واتساپ</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- successSection part -->
+    <section id="successSection" style="display:none; text-align:center;">
+      <h2 style="color:green;">✅ فرم شما آماده ارسال است</h2>
+      <p>واتساپ باز شد. لطفاً در واتساپ روی دکمه <strong>ارسال</strong> بزنید.</p>
+      <img src="./SVGs/whatsapp-whats-app-svgrepo-com.svg" 
+           alt="WhatsApp" width="80" style="margin:15px 0;" />
+      <br>
+      <button id="resetBtn">📋 ثبت مجدد فرم</button>
+    </section>
+
+  </main>
+
+  <!-- فوتر -->
+  <footer class="footer">
+    📌 در صورتی که در برنامه تغییری ایجاد شد به خانم ملکی اطلاع دهید.
+  </footer>
+
+  <script>
+    const TARGET_NUMBER = "989168126382"; 
+
+    function buildMessage() {
+      const name = document.getElementById('fullName').value.trim();
+      const dayCheckboxes = Array.from(document.querySelectorAll('input[name="day"]'));
+      const selected = dayCheckboxes.filter(ch => ch.checked).map(ch => ch.value);
+
+      let lines = [];
+      lines.push('📋 فرم انتخاب روز');
+      if (name) lines.push('👤 نام: ' + name);
+      lines.push('------------------------');
+
+      if (selected.length === 0) {
+        lines.push('❌ هیچ روزی انتخاب نشده است.');
+      } else {
+        lines.push('✅ روزهای انتخاب شده:');
+        selected.forEach(d => lines.push('- ' + d));
+      }
+
+      return lines.join('\n');
+    }
+
+    // Send to WhatsApp
+    document.getElementById('sendBtn').addEventListener('click', () => {
+      const msg = buildMessage();
+      const encoded = encodeURIComponent(msg);
+      const url = `https://api.whatsapp.com/send?phone=${TARGET_NUMBER}&text=${encoded}`;
+      
+      // Whatsapp in new tab
+      window.open(url, '_blank');
+
+      //seccess section show
+      document.getElementById('formSection').style.display = 'none';
+      document.getElementById('successSection').style.display = 'block';
+
+      // RESET FORM
+      document.getElementById('mealForm').reset();
+    });
+
+    // Do it again
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('successSection').style.display = 'none';
+      document.getElementById('formSection').style.display = 'block';
+    });
+  </script>
+</body>
+</html>
